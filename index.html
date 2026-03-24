@@ -134,7 +134,8 @@
       box-shadow: 0 8px 20px rgba(47, 124, 255, 0.28);
     }
 
-    .copy-main-btn:active {
+    .copy-main-btn:active,
+    .copy-item-btn:active {
       transform: scale(0.99);
     }
 
@@ -332,10 +333,6 @@
       cursor: pointer;
     }
 
-    .copy-item-btn:active {
-      transform: scale(0.99);
-    }
-
     details.debug-details {
       margin-top: 12px;
       background: #091427;
@@ -438,7 +435,7 @@
       <button class="copy-main-btn" id="copyLastBtn">Copiar último código</button>
     </div>
 
-    <div class="section-title">Mensagens recebidas</div>
+    <div class="section-title">Última mensagem recebida</div>
     <div id="messagesList"></div>
 
     <div class="footer-note">
@@ -448,6 +445,10 @@
 
   <script>
     let emails = [];
+    let openState = {
+      contentOpen: false,
+      debugOpen: false
+    };
 
     const statusEl = document.getElementById("status");
     const messagesListEl = document.getElementById("messagesList");
@@ -489,12 +490,41 @@
         text.includes("hbo max") ||
         text.includes("alerts.hbomax.com") ||
         text.includes("max.com") ||
-        text.includes("max ")
+        text.includes(" max ")
       ) {
         return { name: "Max", className: "max" };
       }
 
       return { name: "Email", className: "default" };
+    }
+
+    function saveOpenState() {
+      const contentDetails = document.querySelector(".message-body");
+      const debugDetails = document.querySelector(".debug-details");
+
+      openState = {
+        contentOpen: contentDetails ? contentDetails.open : false,
+        debugOpen: debugDetails ? debugDetails.open : false
+      };
+    }
+
+    function restoreOpenState() {
+      const contentDetails = document.querySelector(".message-body");
+      const debugDetails = document.querySelector(".debug-details");
+
+      if (contentDetails) {
+        contentDetails.open = openState.contentOpen;
+        contentDetails.addEventListener("toggle", () => {
+          openState.contentOpen = contentDetails.open;
+        });
+      }
+
+      if (debugDetails) {
+        debugDetails.open = openState.debugOpen;
+        debugDetails.addEventListener("toggle", () => {
+          openState.debugOpen = debugDetails.open;
+        });
+      }
     }
 
     function renderMessages() {
@@ -509,66 +539,65 @@
         return;
       }
 
-      const latestWithCode = emails.find(item => item.code) || emails[0];
-      lastCodeEl.textContent = latestWithCode.code || "SEM CÓDIGO";
-      lastTimeEl.textContent = "Recebido em " + formatDate(latestWithCode.receivedAt);
+      const item = emails[0];
+      const badge = detectarBadge(item);
 
-      messagesListEl.innerHTML = emails.map(item => {
-        const badge = detectarBadge(item);
+      lastCodeEl.textContent = item.code || "SEM CÓDIGO";
+      lastTimeEl.textContent = "Recebido em " + formatDate(item.receivedAt);
 
-        return `
-          <div class="message-card">
-            <div class="message-head">
-              <div class="message-head-left">
-                <div class="badge ${badge.className}">${escapeHtml(badge.name)}</div>
-                <div class="message-subject">${escapeHtml(item.subject || "Nova mensagem recebida")}</div>
-              </div>
-              <div class="message-time">${escapeHtml(formatDate(item.receivedAt))}</div>
+      messagesListEl.innerHTML = `
+        <div class="message-card">
+          <div class="message-head">
+            <div class="message-head-left">
+              <div class="badge ${badge.className}">${escapeHtml(badge.name)}</div>
+              <div class="message-subject">${escapeHtml(item.subject || "Nova mensagem recebida")}</div>
             </div>
-
-            <div class="meta-grid">
-              <div class="meta-card">
-                <div class="meta-label">
-                  <span class="meta-icon">📨</span>
-                  <span>De</span>
-                </div>
-                <div class="meta-value">${escapeHtml(item.senderEmail || "desconhecido")}</div>
-              </div>
-
-              <div class="meta-card">
-                <div class="meta-label">
-                  <span class="meta-icon">📥</span>
-                  <span>Recebido por</span>
-                </div>
-                <div class="meta-value">${escapeHtml(item.recipientEmail || "não identificado")}</div>
-              </div>
-            </div>
-
-            <div class="code-box">
-              <div class="code-label">Código detectado</div>
-              <div class="code-value">${escapeHtml(item.code || "SEM CÓDIGO")}</div>
-            </div>
-
-            <details class="message-body">
-              <summary>Ver conteúdo do email</summary>
-              <div class="message-content">${escapeHtml(item.message || "")}</div>
-            </details>
-
-            <button class="copy-item-btn" data-code="${escapeHtml(item.code || "")}">
-              Copiar esse código
-            </button>
-
-            <details class="debug-details">
-              <summary>Ver debug completo</summary>
-              <pre>${escapeHtml(JSON.stringify(item.debug, null, 2))}</pre>
-            </details>
+            <div class="message-time">${escapeHtml(formatDate(item.receivedAt))}</div>
           </div>
-        `;
-      }).join("");
 
-      document.querySelectorAll(".copy-item-btn").forEach(button => {
-        button.addEventListener("click", async () => {
-          const code = button.getAttribute("data-code") || "";
+          <div class="meta-grid">
+            <div class="meta-card">
+              <div class="meta-label">
+                <span class="meta-icon">📨</span>
+                <span>De</span>
+              </div>
+              <div class="meta-value">${escapeHtml(item.senderEmail || "desconhecido")}</div>
+            </div>
+
+            <div class="meta-card">
+              <div class="meta-label">
+                <span class="meta-icon">📥</span>
+                <span>Recebido por</span>
+              </div>
+              <div class="meta-value">${escapeHtml(item.recipientEmail || "não identificado")}</div>
+            </div>
+          </div>
+
+          <div class="code-box">
+            <div class="code-label">Código detectado</div>
+            <div class="code-value">${escapeHtml(item.code || "SEM CÓDIGO")}</div>
+          </div>
+
+          <details class="message-body">
+            <summary>Ver conteúdo do email</summary>
+            <div class="message-content">${escapeHtml(item.message || "")}</div>
+          </details>
+
+          <button class="copy-item-btn" data-code="${escapeHtml(item.code || "")}">
+            Copiar esse código
+          </button>
+
+          <details class="debug-details">
+            <summary>Ver debug completo</summary>
+            <pre>${escapeHtml(JSON.stringify(item.debug, null, 2))}</pre>
+          </details>
+        </div>
+      `;
+
+      const copyBtn = document.querySelector(".copy-item-btn");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+          const code = copyBtn.getAttribute("data-code") || "";
 
           if (!code || code === "SEM CÓDIGO") {
             alert("Essa mensagem não tem código detectado.");
@@ -577,20 +606,24 @@
 
           try {
             await navigator.clipboard.writeText(code);
-            const oldText = button.textContent;
-            button.textContent = "Copiado!";
+            const oldText = copyBtn.textContent;
+            copyBtn.textContent = "Copiado!";
             setTimeout(() => {
-              button.textContent = oldText;
+              copyBtn.textContent = oldText;
             }, 1200);
           } catch (err) {
             alert("Não consegui copiar.");
           }
         });
-      });
+      }
+
+      restoreOpenState();
     }
 
     async function loadMessages() {
       try {
+        saveOpenState();
+
         statusEl.textContent = "Atualizando...";
         const res = await fetch("/api/webhook");
         const data = await res.json();
@@ -599,7 +632,7 @@
         renderMessages();
 
         statusEl.textContent = emails.length
-          ? `${emails.length} mensagem(ns) recebida(s)`
+          ? "1 mensagem recebida"
           : "Nenhuma mensagem recebida";
       } catch (error) {
         console.error(error);

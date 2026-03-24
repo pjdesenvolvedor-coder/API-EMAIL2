@@ -1,4 +1,4 @@
-let emails = [];
+let latestEmail = null;
 
 function extractCode(text = "") {
   const cleanText = String(text || "");
@@ -69,7 +69,6 @@ function normalizePayload(reqBody) {
     nestedBody.content ||
     payload.content ||
     nestedBody.body ||
-    payload.body?.content ||
     payload.message ||
     payload.text ||
     "";
@@ -121,8 +120,8 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     return res.status(200).json({
       ok: true,
-      total: emails.length,
-      emails
+      total: latestEmail ? 1 : 0,
+      emails: latestEmail ? [latestEmail] : []
     });
   }
 
@@ -136,11 +135,7 @@ export default async function handler(req, res) {
   try {
     const emailItem = normalizePayload(req.body);
 
-    emails.unshift(emailItem);
-
-    if (emails.length > 100) {
-      emails = emails.slice(0, 100);
-    }
+    latestEmail = emailItem;
 
     console.log("Webhook recebido:", JSON.stringify(emailItem, null, 2));
 

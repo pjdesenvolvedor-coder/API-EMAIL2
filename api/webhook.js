@@ -24,11 +24,11 @@ function normalizePayload(reqBody) {
   const headers = payload.headers || {};
   const body = payload.body || {};
 
-  const from =
+  const email =
     body.username ||
     body.email ||
     body.from ||
-    "Remetente desconhecido";
+    "desconhecido";
 
   const message =
     body.content ||
@@ -48,7 +48,7 @@ function normalizePayload(reqBody) {
 
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    from,
+    email: String(email).toLowerCase().trim(),
     subject,
     message,
     code,
@@ -60,10 +60,16 @@ function normalizePayload(reqBody) {
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
+    const emailQuery = String(req.query.email || "").toLowerCase().trim();
+
+    const filtered = emailQuery
+      ? emails.filter(item => item.email === emailQuery)
+      : emails;
+
     return res.status(200).json({
       ok: true,
-      total: emails.length,
-      emails
+      total: filtered.length,
+      emails: filtered
     });
   }
 
@@ -79,8 +85,8 @@ export default async function handler(req, res) {
 
     emails.unshift(emailItem);
 
-    if (emails.length > 50) {
-      emails = emails.slice(0, 50);
+    if (emails.length > 100) {
+      emails = emails.slice(0, 100);
     }
 
     console.log("Webhook recebido:", JSON.stringify(emailItem, null, 2));

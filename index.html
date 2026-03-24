@@ -212,20 +212,30 @@
       border: 1px solid #203656;
       border-radius: 14px;
       padding: 18px;
+      margin-bottom: 18px;
     }
 
-    .message-box h3 {
+    .message-box h3,
+    .meta-box h3 {
       margin-top: 0;
       color: #b8cced;
       font-size: 15px;
     }
 
-    .message-content {
+    .message-content,
+    .meta-content {
       white-space: pre-wrap;
       word-break: break-word;
       line-height: 1.6;
       color: #dce7fa;
       font-size: 14px;
+    }
+
+    .meta-box {
+      background: #0a1223;
+      border: 1px solid #203656;
+      border-radius: 14px;
+      padding: 18px;
     }
 
     .small {
@@ -362,7 +372,7 @@
       main.innerHTML = `
         <div class="card">
           <div class="pill">Último recebimento via webhook</div>
-          <div class="detail-from">De: ${escapeHtml(email.from || "Desconhecido")}</div>
+          <div class="detail-from">Usuário: ${escapeHtml(email.from || "Desconhecido")}</div>
           <div class="detail-subject">${escapeHtml(email.subject || "Sem assunto")}</div>
           <div class="detail-time">Recebido em: ${escapeHtml(formatDate(email.receivedAt))}</div>
 
@@ -379,9 +389,14 @@
             <div class="message-content">${escapeHtml(email.message || "")}</div>
           </div>
 
+          <div class="meta-box">
+            <h3>Dados extras</h3>
+            <div class="meta-content">${escapeHtml(JSON.stringify(email.raw, null, 2))}</div>
+          </div>
+
           <div class="small">
-            Dica: se o webhook mandar um campo <strong>code</strong>, ele aparece direto.
-            Senão o sistema tenta extrair automaticamente do assunto e da mensagem.
+            O sistema lê <strong>body.username</strong> como usuário e
+            <strong>body.content</strong> como mensagem. O código é extraído automaticamente.
           </div>
         </div>
       `;

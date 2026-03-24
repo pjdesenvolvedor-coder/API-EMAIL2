@@ -2,19 +2,60 @@ let emails = [];
 
 function extractCode(text = "") {
   const patterns = [
-    /\b\d{4,8}\b/g,                       
-    /\b[A-Z0-9]{4,10}\b/g,                
-    /\b[A-Z]{2,5}-\d{3,8}\b/g             
+    /\b\d{4,8}\b/g,
+    /\b[A-Z0-9]{4,10}\b/g,
+    /\b[A-Z]{2,5}-\d{3,8}\b/g
   ];
 
   for (const pattern of patterns) {
-    const matches = text.match(pattern);
+    const matches = String(text).match(pattern);
     if (matches && matches.length) {
       return matches[0];
     }
   }
 
   return null;
+}
+
+function normalizePayload(reqBody) {
+  const payload = Array.isArray(reqBody) ? reqBody[0] : reqBody || {};
+
+  const receivedAt = payload.receivedAt || new Date().toISOString();
+  const headers = payload.headers || {};
+  const body = payload.body || {};
+
+  const from =
+    body.username ||
+    body.email ||
+    body.from ||
+    "Remetente desconhecido";
+
+  const message =
+    body.content ||
+    body.body ||
+    body.message ||
+    body.text ||
+    "";
+
+  const subject =
+    body.subject ||
+    "Código recebido";
+
+  const code =
+    body.code ||
+    extractCode(`${subject}\n${message}`) ||
+    null;
+
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    from,
+    subject,
+    message,
+    code,
+    receivedAt,
+    headers,
+    raw: payload
+  };
 }
 
 export default async function handler(req, res) {
@@ -34,50 +75,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = req.body || {};
-
-    const from =
-      body.from ||
-      body.sender ||
-      body.email ||
-      body.mail_from ||
-      "Remetente desconhecido";
-
-    const subject =
-      body.subject ||
-      body.assunto ||
-      "Sem assunto";
-
-    const message =
-      body.body ||
-      body.message ||
-      body.text ||
-      body.html ||
-      body.content ||
-      JSON.stringify(body, null, 2);
-
-    const code =
-      body.code ||
-      extractCode(`${subject}\n${message}`) ||
-      null;
-
-    const emailItem = {
-      id: Date.now().toString(),
-      from,
-      subject,
-      message,
-      code,
-      receivedAt: new Date().toISOString(),
-      raw: body
-    };
+    const emailItem = normalizePayload(req.body);
 
     emails.unshift(emailItem);
 
-    if (emails.length > 20) {
-      emails = emails.slice(0, 20);
+    if (emails.length > 50) {
+      emails = emails.slice(0, 50);
     }
 
-    console.log("Webhook recebido:", emailItem);
+    console.log("Webhook recebido:", JSON.stringify(emailItem, null, 2));
 
     return res.status(200).json({
       ok: true,

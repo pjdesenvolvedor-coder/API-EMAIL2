@@ -3,58 +3,433 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Webhook Receiver</title>
+  <title>Inbox de Códigos</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
+      background: #081226;
+      color: #ffffff;
+      height: 100%;
+    }
+
+    body {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       min-height: 100vh;
     }
 
-    .box {
-      max-width: 700px;
-      width: 90%;
-      background: #111827;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 32px;
+    .topbar {
+      padding: 18px 22px;
+      border-bottom: 1px solid #1d3158;
+      background: #09152d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    h1 {
-      margin-top: 0;
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
     }
 
-    code {
-      display: block;
-      background: #020617;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 10px;
-      color: #86efac;
+    .topbar .status {
+      font-size: 14px;
+      color: #9bb1d1;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 63px);
+    }
+
+    .sidebar {
+      width: 360px;
+      border-right: 1px solid #1d3158;
+      background: #0b1731;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid #1d3158;
+      position: sticky;
+      top: 0;
+      background: #0b1731;
+      z-index: 2;
+    }
+
+    .sidebar-header .endpoint {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #8aa1c5;
       word-break: break-all;
     }
 
-    p {
-      color: #cbd5e1;
+    .email-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .email-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #132648;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .email-item:hover {
+      background: #10203f;
+    }
+
+    .email-item.active {
+      background: #12284d;
+    }
+
+    .email-from {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .email-subject {
+      font-size: 14px;
+      color: #d9e5ff;
+      margin-bottom: 6px;
+    }
+
+    .email-preview {
+      font-size: 12px;
+      color: #93a7c7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-time {
+      font-size: 11px;
+      color: #6f87ab;
+      margin-top: 8px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #081226 0%, #0a1428 100%);
+    }
+
+    .empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #8ba2c7;
+      text-align: center;
+      font-size: 18px;
+      padding: 40px;
+    }
+
+    .card {
+      background: rgba(11, 23, 49, 0.95);
+      border: 1px solid #1d3158;
+      border-radius: 18px;
+      padding: 22px;
+      max-width: 900px;
+    }
+
+    .detail-from {
+      font-size: 15px;
+      color: #8ca8d8;
+      margin-bottom: 8px;
+    }
+
+    .detail-subject {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 14px;
+      line-height: 1.25;
+    }
+
+    .detail-time {
+      font-size: 13px;
+      color: #7e96bb;
+      margin-bottom: 22px;
+    }
+
+    .code-box {
+      background: #07101f;
+      border: 1px solid #274270;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .code-label {
+      font-size: 14px;
+      color: #8aa1c5;
+    }
+
+    .copy-btn {
+      border: 0;
+      background: #1a73e8;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .copy-btn:hover {
+      opacity: 0.92;
+    }
+
+    .code-value {
+      font-size: 40px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      color: #7df7a2;
+      word-break: break-word;
+    }
+
+    .message-box {
+      background: #0a1223;
+      border: 1px solid #203656;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .message-box h3 {
+      margin-top: 0;
+      color: #b8cced;
+      font-size: 15px;
+    }
+
+    .message-content {
+      white-space: pre-wrap;
+      word-break: break-word;
       line-height: 1.6;
+      color: #dce7fa;
+      font-size: 14px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #7f98bc;
+      margin-top: 14px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #102140;
+      border: 1px solid #21395e;
+      color: #9db4d7;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: 320px;
+        border-right: none;
+        border-bottom: 1px solid #1d3158;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .detail-subject {
+        font-size: 22px;
+      }
+
+      .code-value {
+        font-size: 30px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Webhook Receiver</h1>
-    <p>Esse site recebe requisições do seu encaminhador de emails.</p>
-
-    <p>Endpoint:</p>
-    <code>/api/webhook</code>
-
-    <p>Depois do deploy na Vercel, use:</p>
-    <code>https://seu-projeto.vercel.app/api/webhook</code>
+  <div class="topbar">
+    <h1>Inbox de Códigos</h1>
+    <div class="status" id="status">Carregando...</div>
   </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div><strong>Webhook inbox</strong></div>
+        <div class="endpoint">Endpoint: <strong>/api/webhook</strong></div>
+      </div>
+      <ul class="email-list" id="emailList"></ul>
+    </aside>
+
+    <main class="main" id="mainContent">
+      <div class="empty">
+        Nenhum código recebido ainda.<br />
+        Quando chegar um email no webhook, ele aparece aqui.
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let emails = [];
+    let selectedId = null;
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString("pt-BR");
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderList() {
+      const list = document.getElementById("emailList");
+
+      if (!emails.length) {
+        list.innerHTML = `
+          <li class="email-item">
+            <div class="email-subject">Nenhuma mensagem recebida</div>
+            <div class="email-preview">Seu inbox vai aparecer aqui.</div>
+          </li>
+        `;
+        return;
+      }
+
+      list.innerHTML = emails.map(email => `
+        <li class="email-item ${email.id === selectedId ? "active" : ""}" data-id="${email.id}">
+          <div class="email-from">${escapeHtml(email.from || "Desconhecido")}</div>
+          <div class="email-subject">${escapeHtml(email.subject || "Sem assunto")}</div>
+          <div class="email-preview">${escapeHtml(email.code ? "Código: " + email.code : email.message || "")}</div>
+          <div class="email-time">${escapeHtml(formatDate(email.receivedAt))}</div>
+        </li>
+      `).join("");
+
+      document.querySelectorAll(".email-item[data-id]").forEach(item => {
+        item.addEventListener("click", () => {
+          selectedId = item.getAttribute("data-id");
+          renderList();
+          renderDetail();
+        });
+      });
+    }
+
+    function renderDetail() {
+      const main = document.getElementById("mainContent");
+      const email = emails.find(item => item.id === selectedId) || emails[0];
+
+      if (!email) {
+        main.innerHTML = `
+          <div class="empty">
+            Nenhum código recebido ainda.<br />
+            Quando chegar um email no webhook, ele aparece aqui.
+          </div>
+        `;
+        return;
+      }
+
+      selectedId = email.id;
+
+      main.innerHTML = `
+        <div class="card">
+          <div class="pill">Último recebimento via webhook</div>
+          <div class="detail-from">De: ${escapeHtml(email.from || "Desconhecido")}</div>
+          <div class="detail-subject">${escapeHtml(email.subject || "Sem assunto")}</div>
+          <div class="detail-time">Recebido em: ${escapeHtml(formatDate(email.receivedAt))}</div>
+
+          <div class="code-box">
+            <div class="code-header">
+              <div class="code-label">Código detectado</div>
+              <button class="copy-btn" id="copyBtn">Copiar código</button>
+            </div>
+            <div class="code-value" id="codeValue">${escapeHtml(email.code || "SEM CÓDIGO")}</div>
+          </div>
+
+          <div class="message-box">
+            <h3>Conteúdo recebido</h3>
+            <div class="message-content">${escapeHtml(email.message || "")}</div>
+          </div>
+
+          <div class="small">
+            Dica: se o webhook mandar um campo <strong>code</strong>, ele aparece direto.
+            Senão o sistema tenta extrair automaticamente do assunto e da mensagem.
+          </div>
+        </div>
+      `;
+
+      const copyBtn = document.getElementById("copyBtn");
+      const codeValue = document.getElementById("codeValue").innerText;
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(codeValue);
+          copyBtn.innerText = "Copiado!";
+          setTimeout(() => {
+            copyBtn.innerText = "Copiar código";
+          }, 1200);
+        } catch (err) {
+          alert("Não consegui copiar o código.");
+        }
+      });
+    }
+
+    async function loadEmails() {
+      const status = document.getElementById("status");
+
+      try {
+        status.innerText = "Atualizando...";
+        const res = await fetch("/api/webhook");
+        const data = await res.json();
+
+        emails = Array.isArray(data.emails) ? data.emails : [];
+
+        if (!selectedId && emails.length) {
+          selectedId = emails[0].id;
+        }
+
+        renderList();
+        renderDetail();
+
+        status.innerText = emails.length
+          ? `${emails.length} recebido(s)`
+          : "Nenhuma mensagem";
+      } catch (error) {
+        console.error(error);
+        status.innerText = "Erro ao carregar";
+      }
+    }
+
+    loadEmails();
+    setInterval(loadEmails, 3000);
+  </script>
 </body>
 </html>

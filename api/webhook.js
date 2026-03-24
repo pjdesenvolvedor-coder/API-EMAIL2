@@ -1,6 +1,46 @@
 let latestEmail = null;
 
-function extractCode(text = "") {
+function stripHtml(html = "") {
+  return String(html || "")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<\/div>/gi, "\n")
+    .replace(/<\/h1>/gi, "\n")
+    .replace(/<\/h2>/gi, "\n")
+    .replace(/<\/tr>/gi, "\n")
+    .replace(/<\/td>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractGloboCode(text = "") {
+  const raw = String(text || "");
+
+  const specificPatterns = [
+    />\s*(\d{6})\s*<\/div>/i,
+    /c[oó]digo de acesso[\s\S]{0,1200}?(\d{6})/i,
+    /use o c[oó]digo a seguir[\s\S]{0,1200}?(\d{6})/i,
+    /conta globo[\s\S]{0,1200}?(\d{6})/i
+  ];
+
+  for (const pattern of specificPatterns) {
+    const match = raw.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
+function extractGenericCode(text = "") {
   const cleanText = String(text || "");
 
   const patterns = [
@@ -15,6 +55,34 @@ function extractCode(text = "") {
       return matches[0];
     }
   }
+
+  return null;
+}
+
+function extractCode(text = "", sender = "", subject = "") {
+  const raw = String(text || "");
+  const senderText = String(sender || "").toLowerCase();
+  const subjectText = String(subject || "").toLowerCase();
+  const fullText = `${raw}\n${subject}\n${sender}`;
+
+  const isGlobo =
+    senderText.includes("globo") ||
+    subjectText.includes("globo") ||
+    raw.toLowerCase().includes("conta globo") ||
+    raw.toLowerCase().includes("globo.com") ||
+    raw.toLowerCase().includes("globoplay");
+
+  if (isGlobo) {
+    const globoCode = extractGloboCode(fullText);
+    if (globoCode) return globoCode;
+  }
+
+  const textWithoutHtml = stripHtml(fullText);
+  const genericCode = extractGenericCode(textWithoutHtml);
+  if (genericCode) return genericCode;
+
+  const fallbackCode = extractGenericCode(fullText);
+  if (fallbackCode) return fallbackCode;
 
   return null;
 }
@@ -90,7 +158,7 @@ function normalizePayload(reqBody) {
   const code =
     nestedBody.code ||
     payload.code ||
-    extractCode(`${subject}\n${content}`) ||
+    extractCode(content, username, subject) ||
     null;
 
   const recipientEmail =
@@ -134,7 +202,6 @@ export default async function handler(req, res) {
 
   try {
     const emailItem = normalizePayload(req.body);
-
     latestEmail = emailItem;
 
     console.log("Webhook recebido:", JSON.stringify(emailItem, null, 2));

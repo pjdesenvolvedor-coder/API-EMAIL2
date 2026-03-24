@@ -23,8 +23,6 @@
       --muted-2: #7390bc;
       --accent: #2f7cff;
       --success: #7df7a2;
-      --danger: #ff6b6b;
-      --code-bg: #08111f;
       --shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
     }
 
@@ -269,6 +267,12 @@
       box-shadow: 0 8px 20px rgba(31, 111, 255, 0.28);
     }
 
+    .badge.globoplay {
+      background: linear-gradient(180deg, #0a84ff 0%, #005cde 100%);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0, 92, 222, 0.28);
+    }
+
     .badge.default {
       background: #17345f;
       color: #b7d0ff;
@@ -325,7 +329,7 @@
     }
 
     .code-box {
-      background: linear-gradient(180deg, var(--code-bg) 0%, #060d19 100%);
+      background: linear-gradient(180deg, #08111f 0%, #060d19 100%);
       border: 1px solid #24416c;
       border-radius: 18px;
       padding: 14px;
@@ -482,7 +486,7 @@
       <div id="authError" class="auth-error"></div>
 
       <div class="license-box">
-        A chave fica ativa por 30 dias neste navegador. Se vencer, será preciso usar outra chave ainda não usada aqui.
+        A chave fica ativa por 30 dias neste navegador.
       </div>
     </div>
   </div>
@@ -636,8 +640,10 @@
     function showAuth() {
       authView.classList.remove("hidden");
       appView.classList.add("hidden");
-      clearInterval(window.__pollInterval__);
-      window.__pollInterval__ = null;
+      if (window.__pollInterval__) {
+        clearInterval(window.__pollInterval__);
+        window.__pollInterval__ = null;
+      }
     }
 
     function showApp() {
@@ -691,7 +697,10 @@
         (item.recipientEmail || "")
       ).toLowerCase();
 
-      if (text.includes("netflix") || text.includes("account.netflix.com")) {
+      if (
+        text.includes("netflix") ||
+        text.includes("account.netflix.com")
+      ) {
         return { name: "Netflix", className: "netflix" };
       }
 
@@ -703,6 +712,16 @@
         text.includes(" max ")
       ) {
         return { name: "Max", className: "max" };
+      }
+
+      if (
+        text.includes("conta globo") ||
+        text.includes("globo play") ||
+        text.includes("globoplay") ||
+        text.includes("globo.com") ||
+        text.includes("cadastro@globo.com")
+      ) {
+        return { name: "Globo Play", className: "globoplay" };
       }
 
       return { name: "Email", className: "default" };

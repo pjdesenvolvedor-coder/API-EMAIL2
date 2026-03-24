@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Webhook Receiver</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .box {
+      max-width: 700px;
+      width: 90%;
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    code {
+      display: block;
+      background: #020617;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      color: #86efac;
+      word-break: break-all;
+    }
+
+    p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Webhook Receiver</h1>
+    <p>Esse site recebe requisições do seu encaminhador de emails.</p>
+
+    <p>Endpoint:</p>
+    <code>/api/webhook</code>
+
+    <p>Depois do deploy na Vercel, use:</p>
+    <code>https://seu-projeto.vercel.app/api/webhook</code>
+  </div>
+</body>
+</html>

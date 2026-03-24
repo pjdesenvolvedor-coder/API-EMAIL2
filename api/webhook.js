@@ -53,8 +53,14 @@ function normalizePayload(reqBody) {
     message,
     code,
     receivedAt,
-    headers,
-    raw: payload
+
+    // 🔥 DEBUG COMPLETO
+    debug: {
+      original: reqBody,
+      payload,
+      headers,
+      body
+    }
   };
 }
 

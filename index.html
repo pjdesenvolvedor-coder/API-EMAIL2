@@ -361,6 +361,51 @@
       overflow: auto;
     }
 
+        .message-body {
+      background: #091427;
+      border: 1px solid #1b355b;
+      border-radius: 16px;
+      padding: 0;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    
+    .message-body-title {
+      padding: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #9eb9e6;
+      cursor: pointer;
+      list-style: none;
+    }
+    
+    .message-body-title::-webkit-details-marker {
+      display: none;
+    }
+    
+    .message-body-title::after {
+      content: "▼";
+      float: right;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    
+    .message-body[open] .message-body-title::after {
+      content: "▲";
+    }
+    
+    .message-content {
+      padding: 14px;
+      border-top: 1px solid #1b355b;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d8e4fb;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+
     .empty-card {
       background: var(--card);
       border: 1px solid var(--border);

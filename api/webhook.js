@@ -35,11 +35,11 @@ function normalizePayload(reqBody) {
     body.body ||
     body.message ||
     body.text ||
-    "";
+    JSON.stringify(body, null, 2);
 
   const subject =
     body.subject ||
-    "Código recebido";
+    "Nova mensagem recebida";
 
   const code =
     body.code ||
@@ -53,8 +53,6 @@ function normalizePayload(reqBody) {
     message,
     code,
     receivedAt,
-
-    // 🔥 DEBUG COMPLETO
     debug: {
       original: reqBody,
       payload,
@@ -66,16 +64,10 @@ function normalizePayload(reqBody) {
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    const emailQuery = String(req.query.email || "").toLowerCase().trim();
-
-    const filtered = emailQuery
-      ? emails.filter(item => item.email === emailQuery)
-      : emails;
-
     return res.status(200).json({
       ok: true,
-      total: filtered.length,
-      emails: filtered
+      total: emails.length,
+      emails
     });
   }
 

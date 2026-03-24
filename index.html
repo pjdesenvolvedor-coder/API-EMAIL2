@@ -2,168 +2,367 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Códigos</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>Inbox Webhook</title>
 
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
       margin: 0;
-      font-family: Arial;
+      padding: 0;
       background: #081226;
-      color: white;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      min-height: 100%;
+    }
+
+    body {
       max-width: 480px;
-      margin: auto;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #081226 0%, #0a1730 100%);
+      min-height: 100vh;
     }
 
     .app {
       padding: 16px;
+      padding-bottom: 32px;
     }
 
-    input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #2a4770;
-      background: #0a1428;
-      color: white;
-      font-size: 16px;
+    .top {
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #9db3d7;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status-card,
+    .message-card,
+    .hero-card {
+      background: rgba(9, 20, 41, 0.95);
+      border: 1px solid #1c355f;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-line {
+      font-size: 14px;
+      color: #a8bce0;
+    }
+
+    .hero-label {
+      color: #8ea8d1;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .hero-code {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #79f2a4;
+      word-break: break-word;
+      margin-bottom: 12px;
+    }
+
+    .hero-time {
+      color: #7d96bd;
+      font-size: 13px;
+      margin-bottom: 14px;
     }
 
     button {
       width: 100%;
-      margin-top: 10px;
+      border: 0;
+      border-radius: 14px;
       padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: #2b7cff;
-      color: white;
+      font-size: 15px;
       font-weight: bold;
+      background: #1e6ff0;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .section-title {
       font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 14px;
+      color: #dce8ff;
     }
 
-    .card {
-      background: #0a1428;
-      border: 1px solid #1d355a;
-      border-radius: 16px;
-      padding: 14px;
-      margin-top: 14px;
+    .message-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
     }
 
-    .code {
-      font-size: 32px;
+    .message-email {
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .message-time {
+      font-size: 12px;
+      color: #7f99bf;
+      white-space: nowrap;
+    }
+
+    .message-subject {
+      color: #aac2e8;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .message-code {
+      font-size: 28px;
       font-weight: bold;
       color: #7df7a2;
-      margin: 10px 0;
+      letter-spacing: 2px;
+      margin: 8px 0 12px;
+      word-break: break-word;
     }
 
-    .msg {
+    .message-text {
+      color: #d2def7;
       font-size: 14px;
-      color: #cfe0ff;
+      line-height: 1.6;
       white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 12px;
     }
 
-    .debug {
+    .small-btn {
+      width: 100%;
       margin-top: 10px;
+      border: 1px solid #284471;
+      background: #10203d;
+      color: #d6e4ff;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    details {
+      margin-top: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: #8eb0e2;
+      font-size: 13px;
+    }
+
+    pre {
+      margin: 10px 0 0;
       font-size: 11px;
-      background: #020617;
-      padding: 10px;
-      border-radius: 10px;
+      background: #050d1a;
+      padding: 12px;
+      border-radius: 12px;
       overflow: auto;
       border: 1px solid #223b63;
+      color: #dce8ff;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .small {
+    .empty {
+      text-align: center;
+      color: #8da6ce;
+      font-size: 15px;
+      line-height: 1.6;
+      padding: 28px 14px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #718bb3;
       font-size: 12px;
-      color: #7f98bc;
-      margin-top: 6px;
+      margin-top: 8px;
+      line-height: 1.5;
     }
   </style>
 </head>
-
 <body>
   <div class="app">
+    <div class="top">
+      <h1 class="title">Inbox Webhook</h1>
+      <p class="subtitle">
+        Tudo que chegar no webhook aparece aqui automaticamente.
+      </p>
+    </div>
 
-    <h2>Receber código</h2>
+    <div class="status-card">
+      <div class="status-line" id="status">Carregando...</div>
+    </div>
 
-    <input id="email" placeholder="seu@email.com" />
-    <button onclick="entrar()">Entrar</button>
+    <div class="hero-card">
+      <div class="hero-label">Último código detectado</div>
+      <div class="hero-code" id="lastCode">-</div>
+      <div class="hero-time" id="lastTime">Nenhuma mensagem ainda</div>
+      <button id="copyLastBtn">Copiar último código</button>
+    </div>
 
-    <div id="status" class="small"></div>
+    <div class="section-title">Mensagens recebidas</div>
+    <div id="messagesList"></div>
 
-    <div id="lista"></div>
-
+    <div class="footer-note">
+      Endpoint do webhook: <strong>/api/webhook</strong>
+    </div>
   </div>
 
   <script>
-    let currentEmail = localStorage.getItem("email") || "";
+    let emails = [];
 
-    if (currentEmail) {
-      document.getElementById("email").value = currentEmail;
-      carregar();
+    const statusEl = document.getElementById("status");
+    const messagesListEl = document.getElementById("messagesList");
+    const lastCodeEl = document.getElementById("lastCode");
+    const lastTimeEl = document.getElementById("lastTime");
+    const copyLastBtn = document.getElementById("copyLastBtn");
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function entrar() {
-      currentEmail = document.getElementById("email").value.toLowerCase().trim();
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString("pt-BR");
+    }
 
-      if (!currentEmail) {
-        alert("digita o email");
+    function renderMessages() {
+      if (!emails.length) {
+        lastCodeEl.textContent = "-";
+        lastTimeEl.textContent = "Nenhuma mensagem ainda";
+        messagesListEl.innerHTML = `
+          <div class="message-card">
+            <div class="empty">
+              Ainda não chegou nada no webhook.
+            </div>
+          </div>
+        `;
         return;
       }
 
-      localStorage.setItem("email", currentEmail);
-      carregar();
+      const latestWithCode = emails.find(item => item.code) || emails[0];
+      lastCodeEl.textContent = latestWithCode.code || "SEM CÓDIGO";
+      lastTimeEl.textContent = "Recebido em " + formatDate(latestWithCode.receivedAt);
+
+      messagesListEl.innerHTML = emails.map(item => `
+        <div class="message-card">
+          <div class="message-top">
+            <div class="message-email">${escapeHtml(item.email || "desconhecido")}</div>
+            <div class="message-time">${escapeHtml(formatDate(item.receivedAt))}</div>
+          </div>
+
+          <div class="message-subject">${escapeHtml(item.subject || "Nova mensagem recebida")}</div>
+
+          <div class="message-code">${escapeHtml(item.code || "SEM CÓDIGO")}</div>
+
+          <div class="message-text">${escapeHtml(item.message || "")}</div>
+
+          <button class="small-btn copy-btn-item" data-code="${escapeHtml(item.code || "")}">
+            Copiar esse código
+          </button>
+
+          <details>
+            <summary>Ver debug completo</summary>
+            <pre>${escapeHtml(JSON.stringify(item.debug, null, 2))}</pre>
+          </details>
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".copy-btn-item").forEach(button => {
+        button.addEventListener("click", async () => {
+          const code = button.getAttribute("data-code") || "";
+
+          if (!code || code === "SEM CÓDIGO") {
+            alert("Essa mensagem não tem código detectado.");
+            return;
+          }
+
+          try {
+            await navigator.clipboard.writeText(code);
+            const oldText = button.textContent;
+            button.textContent = "Copiado!";
+            setTimeout(() => {
+              button.textContent = oldText;
+            }, 1200);
+          } catch (err) {
+            alert("Não consegui copiar.");
+          }
+        });
+      });
     }
 
-    async function carregar() {
-      document.getElementById("status").innerText = "carregando...";
-
+    async function loadMessages() {
       try {
-        const res = await fetch("/api/webhook?email=" + currentEmail);
+        statusEl.textContent = "Atualizando...";
+        const res = await fetch("/api/webhook");
         const data = await res.json();
 
-        const lista = document.getElementById("lista");
+        emails = Array.isArray(data.emails) ? data.emails : [];
+        renderMessages();
 
-        if (!data.emails.length) {
-          lista.innerHTML = "<div class='small'>nenhum codigo ainda</div>";
-          return;
-        }
-
-        lista.innerHTML = data.emails.map(item => `
-          <div class="card">
-            <div><b>${item.email}</b></div>
-            <div class="small">${new Date(item.receivedAt).toLocaleString()}</div>
-
-            <div class="code">${item.code || "SEM CÓDIGO"}</div>
-
-            <div class="msg">${item.message}</div>
-
-            <button onclick="copiar('${item.code || ""}')">Copiar</button>
-
-            <details style="margin-top:10px;">
-              <summary>DEBUG</summary>
-              <div class="debug">
-                ${JSON.stringify(item.debug, null, 2)}
-              </div>
-            </details>
-          </div>
-        `).join("");
-
-        document.getElementById("status").innerText =
-          data.emails.length + " mensagens";
-
-      } catch (e) {
-        document.getElementById("status").innerText = "erro";
+        statusEl.textContent = emails.length
+          ? emails.length + " mensagem(ns) recebida(s)"
+          : "Nenhuma mensagem recebida";
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = "Erro ao carregar";
       }
     }
 
-    function copiar(code) {
-      if (!code) return alert("sem código");
+    copyLastBtn.addEventListener("click", async () => {
+      const code = lastCodeEl.textContent || "";
 
-      navigator.clipboard.writeText(code);
-      alert("copiado");
-    }
+      if (!code || code === "-" || code === "SEM CÓDIGO") {
+        alert("Ainda não existe código para copiar.");
+        return;
+      }
 
-    setInterval(carregar, 3000);
+      try {
+        await navigator.clipboard.writeText(code);
+        const oldText = copyLastBtn.textContent;
+        copyLastBtn.textContent = "Copiado!";
+        setTimeout(() => {
+          copyLastBtn.textContent = oldText;
+        }, 1200);
+      } catch (err) {
+        alert("Não consegui copiar.");
+      }
+    });
+
+    loadMessages();
+    setInterval(loadMessages, 3000);
   </script>
 </body>
 </html>

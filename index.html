@@ -111,7 +111,6 @@
       font-size: 16px;
       outline: none;
       margin-bottom: 12px;
-      text-transform: uppercase;
     }
 
     .input:focus {
@@ -446,7 +445,7 @@
       line-height: 1.5;
     }
 
-    .license-box {
+    .password-box {
       margin-top: 14px;
       background: #091427;
       border: 1px solid #1b355b;
@@ -467,26 +466,26 @@
 <body>
   <div id="authView" class="auth-wrap">
     <div class="auth-screen">
-      <h1 class="auth-title">Acesso por chave</h1>
+      <h1 class="auth-title">Acesso</h1>
       <p class="auth-subtitle">
-        Digite sua chave para liberar o acesso por 30 dias neste celular/navegador.
+        Digite a senha para abrir o painel.
       </p>
 
       <input
-        id="licenseInput"
+        id="passwordInput"
         class="input"
-        type="text"
-        placeholder="XXXX-XXXX-XXXX"
+        type="password"
+        placeholder="Digite a senha"
         autocomplete="off"
         spellcheck="false"
       />
 
-      <button id="activateBtn" class="btn">Ativar chave</button>
+      <button id="loginBtn" class="btn">Entrar</button>
 
       <div id="authError" class="auth-error"></div>
 
-      <div class="license-box">
-        A chave fica ativa por 30 dias neste navegador.
+      <div class="password-box">
+        A senha fica salva neste navegador até você sair.
       </div>
     </div>
   </div>
@@ -502,8 +501,8 @@
     </div>
 
     <div class="status-card">
-      <div class="status-line" id="licenseStatus">Chave ativa</div>
-      <button id="logoutBtn" class="btn btn-secondary">Remover chave deste navegador</button>
+      <div class="status-line">Acesso liberado</div>
+      <button id="logoutBtn" class="btn btn-secondary">Sair</button>
     </div>
 
     <div class="hero-card">
@@ -524,22 +523,8 @@
   </div>
 
   <script>
-    const VALID_KEYS = [
-      "X9K2-MP4Q-7TAL",
-      "B3NV-2QPL-8ZRM",
-      "T7YA-K2MN-4QPX",
-      "R8LP-V3NA-6KQT",
-      "M4QZ-X7TA-2PLN",
-      "K9TR-5VBN-3QAX",
-      "P2LM-8QZT-4NVA",
-      "A7QK-3XMP-9TLR",
-      "N5VB-2RQA-8XLM",
-      "Q4TA-7PLN-6KMX"
-    ];
-
-    const STORAGE_SESSION = "webhook_license_session_v1";
-    const STORAGE_USED_KEYS = "webhook_used_keys_v1";
-    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const FIXED_PASSWORD = "Ae@1234Br";
+    const STORAGE_AUTH = "webhook_fixed_password_auth_v1";
 
     let emails = [];
     let openState = {
@@ -549,91 +534,41 @@
 
     const authView = document.getElementById("authView");
     const appView = document.getElementById("appView");
-    const licenseInput = document.getElementById("licenseInput");
-    const activateBtn = document.getElementById("activateBtn");
+    const passwordInput = document.getElementById("passwordInput");
+    const loginBtn = document.getElementById("loginBtn");
     const authError = document.getElementById("authError");
     const logoutBtn = document.getElementById("logoutBtn");
 
     const statusEl = document.getElementById("status");
-    const licenseStatusEl = document.getElementById("licenseStatus");
     const messagesListEl = document.getElementById("messagesList");
     const lastCodeEl = document.getElementById("lastCode");
     const lastTimeEl = document.getElementById("lastTime");
     const copyLastBtn = document.getElementById("copyLastBtn");
 
-    function normalizeKey(key) {
-      return String(key || "").trim().toUpperCase();
+    function setLoggedIn(value) {
+      localStorage.setItem(STORAGE_AUTH, value ? "true" : "false");
     }
 
-    function getUsedKeys() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_USED_KEYS) || "[]");
-      } catch {
-        return [];
-      }
+    function isLoggedIn() {
+      return localStorage.getItem(STORAGE_AUTH) === "true";
     }
 
-    function saveUsedKeys(keys) {
-      localStorage.setItem(STORAGE_USED_KEYS, JSON.stringify(keys));
-    }
-
-    function getSession() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_SESSION) || "null");
-      } catch {
-        return null;
-      }
-    }
-
-    function saveSession(session) {
-      localStorage.setItem(STORAGE_SESSION, JSON.stringify(session));
-    }
-
-    function clearSession() {
-      localStorage.removeItem(STORAGE_SESSION);
-    }
-
-    function isSessionValid(session) {
-      if (!session || !session.key || !session.expiresAt) return false;
-      return Date.now() < Number(session.expiresAt);
-    }
-
-    function formatExpiry(timestamp) {
-      return new Date(timestamp).toLocaleString("pt-BR");
-    }
-
-    function activateLicense() {
-      const key = normalizeKey(licenseInput.value);
+    function login() {
+      const password = passwordInput.value;
       authError.textContent = "";
 
-      if (!key) {
-        authError.textContent = "Digite a chave.";
+      if (!password) {
+        authError.textContent = "Digite a senha.";
         return;
       }
 
-      if (!VALID_KEYS.includes(key)) {
-        authError.textContent = "Chave inválida.";
+      if (password !== FIXED_PASSWORD) {
+        authError.textContent = "Senha incorreta.";
         return;
       }
 
-      const usedKeys = getUsedKeys();
-
-      if (usedKeys.includes(key)) {
-        authError.textContent = "Essa chave já foi usada neste navegador.";
-        return;
-      }
-
-      const expiresAt = Date.now() + THIRTY_DAYS_MS;
-
-      usedKeys.push(key);
-      saveUsedKeys(usedKeys);
-
-      saveSession({
-        key,
-        expiresAt
-      });
-
-      licenseInput.value = "";
+      setLoggedIn(true);
+      passwordInput.value = "";
       showApp();
     }
 
@@ -647,29 +582,13 @@
     }
 
     function showApp() {
-      const session = getSession();
-
-      if (!isSessionValid(session)) {
-        clearSession();
-        showAuth();
-        return;
-      }
-
       authView.classList.add("hidden");
       appView.classList.remove("hidden");
-      licenseStatusEl.textContent =
-        "Chave ativa até " + formatExpiry(session.expiresAt);
 
       loadMessages();
 
       if (!window.__pollInterval__) {
         window.__pollInterval__ = setInterval(() => {
-          const currentSession = getSession();
-          if (!isSessionValid(currentSession)) {
-            clearSession();
-            showAuth();
-            return;
-          }
           loadMessages();
         }, 3000);
       }
@@ -863,16 +782,16 @@
       }
     }
 
-    activateBtn.addEventListener("click", activateLicense);
+    loginBtn.addEventListener("click", login);
 
-    licenseInput.addEventListener("keydown", (event) => {
+    passwordInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        activateLicense();
+        login();
       }
     });
 
     logoutBtn.addEventListener("click", () => {
-      clearSession();
+      setLoggedIn(false);
       showAuth();
     });
 
@@ -896,11 +815,9 @@
       }
     });
 
-    const session = getSession();
-    if (isSessionValid(session)) {
+    if (isLoggedIn()) {
       showApp();
     } else {
-      clearSession();
       showAuth();
     }
   </script>

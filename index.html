@@ -16,18 +16,14 @@
 
     :root {
       --bg: #081226;
-      --bg-2: #0b1731;
       --card: rgba(11, 23, 49, 0.96);
       --border: #1f3760;
-      --border-soft: #173057;
       --text: #ffffff;
       --muted: #9cb4d8;
       --muted-2: #7390bc;
       --accent: #2f7cff;
-      --accent-2: #1d6df0;
       --success: #7df7a2;
       --code-bg: #08111f;
-      --pill-bg: #0f1f3d;
       --shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
     }
 
@@ -274,27 +270,48 @@
       background: #091427;
       border: 1px solid #1b355b;
       border-radius: 16px;
-      padding: 14px;
       margin-bottom: 12px;
+      overflow: hidden;
     }
 
-    .message-body-title {
+    .message-body summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 14px;
       font-size: 12px;
       font-weight: 800;
       color: #93afda;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 10px;
+      user-select: none;
     }
 
-    .message-text {
-      margin: 0;
+    .message-body summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .message-body summary::after {
+      content: "▼";
+      float: right;
+      font-size: 11px;
+      opacity: 0.8;
+      transform: translateY(1px);
+    }
+
+    .message-body[open] summary::after {
+      content: "▲";
+    }
+
+    .message-content {
+      padding: 0 14px 14px;
       color: #d8e4fb;
       font-size: 14px;
       line-height: 1.65;
       white-space: pre-wrap;
       word-break: break-word;
       overflow-wrap: anywhere;
+      border-top: 1px solid #1b355b;
+      padding-top: 14px;
     }
 
     .copy-item-btn {
@@ -313,7 +330,7 @@
       transform: scale(0.99);
     }
 
-    details {
+    details.debug-details {
       margin-top: 12px;
       background: #091427;
       border: 1px solid #173158;
@@ -321,7 +338,7 @@
       padding: 12px;
     }
 
-    summary {
+    details.debug-details summary {
       cursor: pointer;
       color: #9eb9e6;
       font-size: 13px;
@@ -329,11 +346,11 @@
       list-style: none;
     }
 
-    summary::-webkit-details-marker {
+    details.debug-details summary::-webkit-details-marker {
       display: none;
     }
 
-    summary::after {
+    details.debug-details summary::after {
       content: "▼";
       float: right;
       font-size: 11px;
@@ -341,7 +358,7 @@
       transform: translateY(2px);
     }
 
-    details[open] summary::after {
+    details.debug-details[open] summary::after {
       content: "▲";
     }
 
@@ -360,51 +377,6 @@
       max-height: 320px;
       overflow: auto;
     }
-
-        .message-body {
-      background: #091427;
-      border: 1px solid #1b355b;
-      border-radius: 16px;
-      padding: 0;
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-    
-    .message-body-title {
-      padding: 14px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #9eb9e6;
-      cursor: pointer;
-      list-style: none;
-    }
-    
-    .message-body-title::-webkit-details-marker {
-      display: none;
-    }
-    
-    .message-body-title::after {
-      content: "▼";
-      float: right;
-      font-size: 11px;
-      opacity: 0.7;
-    }
-    
-    .message-body[open] .message-body-title::after {
-      content: "▲";
-    }
-    
-    .message-content {
-      padding: 14px;
-      border-top: 1px solid #1b355b;
-      font-size: 14px;
-      line-height: 1.6;
-      color: #d8e4fb;
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-    }
-
 
     .empty-card {
       background: var(--card);
@@ -557,16 +529,16 @@
               <div class="code-value">${escapeHtml(item.code || "SEM CÓDIGO")}</div>
             </div>
 
-            <div class="message-body">
-              <div class="message-body-title">Conteúdo do email</div>
-              <p class="message-text">${escapeHtml(item.message || "")}</p>
-            </div>
+            <details class="message-body">
+              <summary>Ver conteúdo do email</summary>
+              <div class="message-content">${escapeHtml(item.message || "")}</div>
+            </details>
 
             <button class="copy-item-btn" data-code="${escapeHtml(item.code || "")}">
               Copiar esse código
             </button>
 
-            <details>
+            <details class="debug-details">
               <summary>Ver debug completo</summary>
               <pre>${escapeHtml(JSON.stringify(item.debug, null, 2))}</pre>
             </details>

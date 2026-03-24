@@ -75,7 +75,7 @@
     }
 
     .hero-code {
-      font-size: 42px;
+      font-size: 46px;
       line-height: 1;
       font-weight: 800;
       letter-spacing: 3px;
@@ -114,13 +114,20 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .message-email {
-      font-size: 14px;
+    .message-title {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .message-subject {
+      color: #ffffff;
+      font-size: 15px;
       font-weight: bold;
-      color: #fff;
+      line-height: 1.4;
+      margin-bottom: 8px;
       word-break: break-word;
     }
 
@@ -130,18 +137,54 @@
       white-space: nowrap;
     }
 
-    .message-subject {
-      color: #aac2e8;
-      font-size: 13px;
-      margin-bottom: 10px;
+    .email-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .email-pill {
+      background: #0d1d38;
+      border: 1px solid #24416a;
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .email-pill-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #87a4d5;
+      margin-bottom: 6px;
+    }
+
+    .email-pill-value {
+      font-size: 14px;
+      color: #ffffff;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .message-code-box {
+      background: #07111f;
+      border: 1px solid #274270;
+      border-radius: 18px;
+      padding: 14px;
+      margin: 10px 0 14px;
+    }
+
+    .message-code-label {
+      font-size: 12px;
+      color: #8ea8d1;
+      margin-bottom: 8px;
     }
 
     .message-code {
-      font-size: 28px;
+      font-size: 34px;
       font-weight: bold;
       color: #7df7a2;
       letter-spacing: 2px;
-      margin: 8px 0 12px;
       word-break: break-word;
     }
 
@@ -152,6 +195,10 @@
       white-space: pre-wrap;
       word-break: break-word;
       margin-bottom: 12px;
+      background: #091427;
+      border: 1px solid #1d355a;
+      border-radius: 14px;
+      padding: 14px;
     }
 
     .small-btn {
@@ -212,7 +259,7 @@
     <div class="top">
       <h1 class="title">Inbox Webhook</h1>
       <p class="subtitle">
-        Tudo que chegar no webhook aparece aqui automaticamente.
+        Tudo que chegar no webhook aparece aqui, já formatado.
       </p>
     </div>
 
@@ -279,13 +326,28 @@
       messagesListEl.innerHTML = emails.map(item => `
         <div class="message-card">
           <div class="message-top">
-            <div class="message-email">${escapeHtml(item.email || "desconhecido")}</div>
+            <div class="message-title">
+              <div class="message-subject">${escapeHtml(item.subject || "Nova mensagem recebida")}</div>
+            </div>
             <div class="message-time">${escapeHtml(formatDate(item.receivedAt))}</div>
           </div>
 
-          <div class="message-subject">${escapeHtml(item.subject || "Nova mensagem recebida")}</div>
+          <div class="email-row">
+            <div class="email-pill">
+              <div class="email-pill-label">De</div>
+              <div class="email-pill-value">${escapeHtml(item.senderEmail || "desconhecido")}</div>
+            </div>
 
-          <div class="message-code">${escapeHtml(item.code || "SEM CÓDIGO")}</div>
+            <div class="email-pill">
+              <div class="email-pill-label">Recebido por</div>
+              <div class="email-pill-value">${escapeHtml(item.recipientEmail || "não identificado")}</div>
+            </div>
+          </div>
+
+          <div class="message-code-box">
+            <div class="message-code-label">Código detectado</div>
+            <div class="message-code">${escapeHtml(item.code || "SEM CÓDIGO")}</div>
+          </div>
 
           <div class="message-text">${escapeHtml(item.message || "")}</div>
 

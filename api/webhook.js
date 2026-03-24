@@ -1,6 +1,8 @@
 let emails = [];
 
 function extractCode(text = "") {
+  const cleanText = String(text || "");
+
   const patterns = [
     /\b\d{4,8}\b/g,
     /\b[A-Z0-9]{4,10}\b/g,
@@ -8,7 +10,7 @@ function extractCode(text = "") {
   ];
 
   for (const pattern of patterns) {
-    const matches = String(text).match(pattern);
+    const matches = cleanText.match(pattern);
     if (matches && matches.length) {
       return matches[0];
     }
@@ -17,47 +19,100 @@ function extractCode(text = "") {
   return null;
 }
 
+function extractRecipientEmail(text = "") {
+  const cleanText = String(text || "");
+
+  const patterns = [
+    /Esta mensagem foi enviada para\s*\[([^\]]+@[^\]]+)\]/i,
+    /enviada para\s*\[([^\]]+@[^\]]+)\]/i,
+    /\[([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\]/i,
+    /\b([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})\b/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = cleanText.match(pattern);
+    if (match && match[1]) {
+      return match[1].trim().toLowerCase();
+    }
+  }
+
+  return null;
+}
+
+function extractSubject(text = "") {
+  const cleanText = String(text || "").trim();
+  if (!cleanText) return "Nova mensagem recebida";
+
+  const firstLine = cleanText
+    .split("\n")
+    .map(line => line.trim())
+    .find(line => line.length > 0);
+
+  return firstLine || "Nova mensagem recebida";
+}
+
 function normalizePayload(reqBody) {
-  const payload = Array.isArray(reqBody) ? reqBody[0] : reqBody || {};
+  let payload = reqBody;
+
+  if (Array.isArray(reqBody)) {
+    payload = reqBody[0] || {};
+  }
+
+  payload = payload || {};
 
   const receivedAt = payload.receivedAt || new Date().toISOString();
-  const headers = payload.headers || {};
-  const body = payload.body || {};
 
-  const email =
-    body.username ||
-    body.email ||
-    body.from ||
+  const nestedHeaders = payload.headers || {};
+  const nestedBody = payload.body || {};
+
+  const content =
+    nestedBody.content ||
+    payload.content ||
+    nestedBody.body ||
+    payload.body?.content ||
+    payload.message ||
+    payload.text ||
+    "";
+
+  const username =
+    nestedBody.username ||
+    payload.username ||
+    nestedBody.email ||
+    payload.email ||
+    nestedBody.from ||
+    payload.from ||
     "desconhecido";
 
-  const message =
-    body.content ||
-    body.body ||
-    body.message ||
-    body.text ||
-    JSON.stringify(body, null, 2);
-
   const subject =
-    body.subject ||
-    "Nova mensagem recebida";
+    nestedBody.subject ||
+    payload.subject ||
+    extractSubject(content);
 
   const code =
-    body.code ||
-    extractCode(`${subject}\n${message}`) ||
+    nestedBody.code ||
+    payload.code ||
+    extractCode(`${subject}\n${content}`) ||
+    null;
+
+  const recipientEmail =
+    nestedBody.to ||
+    payload.to ||
+    extractRecipientEmail(content) ||
     null;
 
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    email: String(email).toLowerCase().trim(),
+    senderEmail: String(username || "desconhecido").trim().toLowerCase(),
+    recipientEmail: recipientEmail ? String(recipientEmail).trim().toLowerCase() : null,
     subject,
-    message,
+    message: content,
     code,
     receivedAt,
     debug: {
       original: reqBody,
       payload,
-      headers,
-      body
+      headers: nestedHeaders,
+      body: nestedBody
     }
   };
 }

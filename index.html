@@ -272,6 +272,12 @@
       box-shadow: 0 8px 20px rgba(0, 92, 222, 0.28);
     }
 
+    .badge.disney {
+      background: linear-gradient(180deg, #113ccf 0%, #0a66ff 100%);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(17, 60, 207, 0.30);
+    }
+
     .badge.default {
       background: #17345f;
       color: #b7d0ff;
@@ -641,6 +647,19 @@
         text.includes("cadastro@globo.com")
       ) {
         return { name: "Globo Play", className: "globoplay" };
+      }
+
+      if (
+        text.includes("disney+") ||
+        text.includes("disneyplus") ||
+        text.includes("mail2.disneyplus.com") ||
+        text.includes("trx.mail2.disneyplus.com") ||
+        text.includes("mydisney") ||
+        text.includes("walt disney") ||
+        text.includes("disney streaming") ||
+        text.includes("disney")
+      ) {
+        return { name: "Disney+", className: "disney" };
       }
 
       return { name: "Email", className: "default" };

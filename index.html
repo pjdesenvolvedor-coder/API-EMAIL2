@@ -167,7 +167,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      height: 28px;
+      min-height: 28px;
       padding: 0 12px;
       border-radius: 999px;
       font-size: 12px;
@@ -180,6 +180,12 @@
       background: #e50914;
       color: #fff;
       box-shadow: 0 8px 20px rgba(229, 9, 20, 0.25);
+    }
+
+    .badge.max {
+      background: linear-gradient(180deg, #1f6fff 0%, #0d47d9 100%);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(31, 111, 255, 0.28);
     }
 
     .badge.default {
@@ -467,11 +473,25 @@
       const text = (
         (item.subject || "") + " " +
         (item.message || "") + " " +
-        (item.senderEmail || "")
+        (item.senderEmail || "") + " " +
+        (item.recipientEmail || "")
       ).toLowerCase();
 
-      if (text.includes("netflix")) {
+      if (
+        text.includes("netflix") ||
+        text.includes("account.netflix.com")
+      ) {
         return { name: "Netflix", className: "netflix" };
+      }
+
+      if (
+        text.includes("hbomax") ||
+        text.includes("hbo max") ||
+        text.includes("alerts.hbomax.com") ||
+        text.includes("max.com") ||
+        text.includes("max ")
+      ) {
+        return { name: "Max", className: "max" };
       }
 
       return { name: "Email", className: "default" };

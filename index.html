@@ -23,6 +23,7 @@
       --muted-2: #7390bc;
       --accent: #2f7cff;
       --success: #7df7a2;
+      --danger: #ff6b6b;
       --code-bg: #08111f;
       --shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
     }
@@ -42,13 +43,13 @@
       min-height: 100vh;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     .app {
       padding: 16px;
       padding-bottom: 32px;
-    }
-
-    .top {
-      margin-bottom: 16px;
     }
 
     .title {
@@ -66,6 +67,7 @@
       line-height: 1.5;
     }
 
+    .auth-screen,
     .hero-card,
     .message-card,
     .status-card {
@@ -73,6 +75,75 @@
       border: 1px solid var(--border);
       border-radius: 22px;
       box-shadow: var(--shadow);
+    }
+
+    .auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .auth-screen {
+      width: 100%;
+      padding: 22px;
+    }
+
+    .auth-title {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .auth-subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid #294777;
+      background: #091427;
+      color: white;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .input:focus {
+      border-color: #3c84ff;
+    }
+
+    .btn {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, #3c84ff 0%, var(--accent) 100%);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: #112241;
+      border: 1px solid #284471;
+      color: #d7e4ff;
+      margin-top: 10px;
+    }
+
+    .auth-error {
+      margin-top: 12px;
+      color: #ff9b9b;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .status-card {
@@ -121,7 +192,8 @@
       margin-bottom: 12px;
     }
 
-    .copy-main-btn {
+    .copy-main-btn,
+    .copy-item-btn {
       width: 100%;
       border: 0;
       border-radius: 14px;
@@ -131,11 +203,19 @@
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(47, 124, 255, 0.28);
+    }
+
+    .copy-item-btn {
+      background: #112241;
+      border: 1px solid #284471;
+      color: #d7e4ff;
+      font-size: 14px;
+      padding: 12px 14px;
     }
 
     .copy-main-btn:active,
-    .copy-item-btn:active {
+    .copy-item-btn:active,
+    .btn:active {
       transform: scale(0.99);
     }
 
@@ -236,11 +316,6 @@
       margin-bottom: 8px;
     }
 
-    .meta-icon {
-      font-size: 14px;
-      line-height: 1;
-    }
-
     .meta-value {
       font-size: 14px;
       line-height: 1.55;
@@ -281,7 +356,8 @@
       overflow: hidden;
     }
 
-    .message-body summary {
+    .message-body summary,
+    .debug-details summary {
       cursor: pointer;
       list-style: none;
       padding: 14px;
@@ -293,11 +369,13 @@
       user-select: none;
     }
 
-    .message-body summary::-webkit-details-marker {
+    .message-body summary::-webkit-details-marker,
+    .debug-details summary::-webkit-details-marker {
       display: none;
     }
 
-    .message-body summary::after {
+    .message-body summary::after,
+    .debug-details summary::after {
       content: "▼";
       float: right;
       font-size: 11px;
@@ -305,12 +383,13 @@
       transform: translateY(1px);
     }
 
-    .message-body[open] summary::after {
+    .message-body[open] summary::after,
+    .debug-details[open] summary::after {
       content: "▲";
     }
 
     .message-content {
-      padding: 0 14px 14px;
+      padding: 14px;
       color: #d8e4fb;
       font-size: 14px;
       line-height: 1.65;
@@ -318,59 +397,22 @@
       word-break: break-word;
       overflow-wrap: anywhere;
       border-top: 1px solid #1b355b;
-      padding-top: 14px;
     }
 
-    .copy-item-btn {
-      width: 100%;
-      border: 1px solid #284471;
-      background: #112241;
-      color: #d7e4ff;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    details.debug-details {
+    .debug-details {
       margin-top: 12px;
       background: #091427;
       border: 1px solid #173158;
       border-radius: 14px;
-      padding: 12px;
-    }
-
-    details.debug-details summary {
-      cursor: pointer;
-      color: #9eb9e6;
-      font-size: 13px;
-      font-weight: 700;
-      list-style: none;
-    }
-
-    details.debug-details summary::-webkit-details-marker {
-      display: none;
-    }
-
-    details.debug-details summary::after {
-      content: "▼";
-      float: right;
-      font-size: 11px;
-      opacity: 0.8;
-      transform: translateY(2px);
-    }
-
-    details.debug-details[open] summary::after {
-      content: "▲";
+      padding: 0;
+      overflow: hidden;
     }
 
     pre {
-      margin: 12px 0 0;
+      margin: 0;
       padding: 12px;
       background: #040b15;
-      border: 1px solid #1d385f;
-      border-radius: 12px;
+      border-top: 1px solid #1d385f;
       color: #dce8ff;
       font-size: 11px;
       line-height: 1.55;
@@ -400,23 +442,52 @@
       line-height: 1.5;
     }
 
+    .license-box {
+      margin-top: 14px;
+      background: #091427;
+      border: 1px solid #1b355b;
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 13px;
+      color: #cfe0ff;
+      line-height: 1.6;
+    }
+
     @media (max-width: 360px) {
-      .title {
-        font-size: 28px;
-      }
-
-      .hero-code {
-        font-size: 46px;
-      }
-
-      .code-value {
-        font-size: 32px;
-      }
+      .title { font-size: 28px; }
+      .hero-code { font-size: 46px; }
+      .code-value { font-size: 32px; }
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div id="authView" class="auth-wrap">
+    <div class="auth-screen">
+      <h1 class="auth-title">Acesso por chave</h1>
+      <p class="auth-subtitle">
+        Digite sua chave para liberar o acesso por 30 dias neste celular/navegador.
+      </p>
+
+      <input
+        id="licenseInput"
+        class="input"
+        type="text"
+        placeholder="XXXX-XXXX-XXXX"
+        autocomplete="off"
+        spellcheck="false"
+      />
+
+      <button id="activateBtn" class="btn">Ativar chave</button>
+
+      <div id="authError" class="auth-error"></div>
+
+      <div class="license-box">
+        A chave fica ativa por 30 dias neste navegador. Se vencer, será preciso usar outra chave ainda não usada aqui.
+      </div>
+    </div>
+  </div>
+
+  <div id="appView" class="app hidden">
     <div class="top">
       <h1 class="title">Inbox Webhook</h1>
       <p class="subtitle">Mensagens recebidas em tempo real</p>
@@ -424,6 +495,11 @@
 
     <div class="status-card">
       <div class="status-line" id="status">Carregando...</div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-line" id="licenseStatus">Chave ativa</div>
+      <button id="logoutBtn" class="btn btn-secondary">Remover chave deste navegador</button>
     </div>
 
     <div class="hero-card">
@@ -444,17 +520,154 @@
   </div>
 
   <script>
+    const VALID_KEYS = [
+      "X9K2-MP4Q-7TAL",
+      "B3NV-2QPL-8ZRM",
+      "T7YA-K2MN-4QPX",
+      "R8LP-V3NA-6KQT",
+      "M4QZ-X7TA-2PLN",
+      "K9TR-5VBN-3QAX",
+      "P2LM-8QZT-4NVA",
+      "A7QK-3XMP-9TLR",
+      "N5VB-2RQA-8XLM",
+      "Q4TA-7PLN-6KMX"
+    ];
+
+    const STORAGE_SESSION = "webhook_license_session_v1";
+    const STORAGE_USED_KEYS = "webhook_used_keys_v1";
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
     let emails = [];
     let openState = {
       contentOpen: false,
       debugOpen: false
     };
 
+    const authView = document.getElementById("authView");
+    const appView = document.getElementById("appView");
+    const licenseInput = document.getElementById("licenseInput");
+    const activateBtn = document.getElementById("activateBtn");
+    const authError = document.getElementById("authError");
+    const logoutBtn = document.getElementById("logoutBtn");
+
     const statusEl = document.getElementById("status");
+    const licenseStatusEl = document.getElementById("licenseStatus");
     const messagesListEl = document.getElementById("messagesList");
     const lastCodeEl = document.getElementById("lastCode");
     const lastTimeEl = document.getElementById("lastTime");
     const copyLastBtn = document.getElementById("copyLastBtn");
+
+    function normalizeKey(key) {
+      return String(key || "").trim().toUpperCase();
+    }
+
+    function getUsedKeys() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_USED_KEYS) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUsedKeys(keys) {
+      localStorage.setItem(STORAGE_USED_KEYS, JSON.stringify(keys));
+    }
+
+    function getSession() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_SESSION) || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function saveSession(session) {
+      localStorage.setItem(STORAGE_SESSION, JSON.stringify(session));
+    }
+
+    function clearSession() {
+      localStorage.removeItem(STORAGE_SESSION);
+    }
+
+    function isSessionValid(session) {
+      if (!session || !session.key || !session.expiresAt) return false;
+      return Date.now() < Number(session.expiresAt);
+    }
+
+    function formatExpiry(timestamp) {
+      return new Date(timestamp).toLocaleString("pt-BR");
+    }
+
+    function activateLicense() {
+      const key = normalizeKey(licenseInput.value);
+      authError.textContent = "";
+
+      if (!key) {
+        authError.textContent = "Digite a chave.";
+        return;
+      }
+
+      if (!VALID_KEYS.includes(key)) {
+        authError.textContent = "Chave inválida.";
+        return;
+      }
+
+      const usedKeys = getUsedKeys();
+
+      if (usedKeys.includes(key)) {
+        authError.textContent = "Essa chave já foi usada neste navegador.";
+        return;
+      }
+
+      const expiresAt = Date.now() + THIRTY_DAYS_MS;
+
+      usedKeys.push(key);
+      saveUsedKeys(usedKeys);
+
+      saveSession({
+        key,
+        expiresAt
+      });
+
+      licenseInput.value = "";
+      showApp();
+    }
+
+    function showAuth() {
+      authView.classList.remove("hidden");
+      appView.classList.add("hidden");
+      clearInterval(window.__pollInterval__);
+      window.__pollInterval__ = null;
+    }
+
+    function showApp() {
+      const session = getSession();
+
+      if (!isSessionValid(session)) {
+        clearSession();
+        showAuth();
+        return;
+      }
+
+      authView.classList.add("hidden");
+      appView.classList.remove("hidden");
+      licenseStatusEl.textContent =
+        "Chave ativa até " + formatExpiry(session.expiresAt);
+
+      loadMessages();
+
+      if (!window.__pollInterval__) {
+        window.__pollInterval__ = setInterval(() => {
+          const currentSession = getSession();
+          if (!isSessionValid(currentSession)) {
+            clearSession();
+            showAuth();
+            return;
+          }
+          loadMessages();
+        }, 3000);
+      }
+    }
 
     function escapeHtml(text) {
       return String(text || "")
@@ -478,10 +691,7 @@
         (item.recipientEmail || "")
       ).toLowerCase();
 
-      if (
-        text.includes("netflix") ||
-        text.includes("account.netflix.com")
-      ) {
+      if (text.includes("netflix") || text.includes("account.netflix.com")) {
         return { name: "Netflix", className: "netflix" };
       }
 
@@ -557,18 +767,12 @@
 
           <div class="meta-grid">
             <div class="meta-card">
-              <div class="meta-label">
-                <span class="meta-icon">📨</span>
-                <span>De</span>
-              </div>
+              <div class="meta-label">📨 De</div>
               <div class="meta-value">${escapeHtml(item.senderEmail || "desconhecido")}</div>
             </div>
 
             <div class="meta-card">
-              <div class="meta-label">
-                <span class="meta-icon">📥</span>
-                <span>Recebido por</span>
-              </div>
+              <div class="meta-label">📥 Recebido por</div>
               <div class="meta-value">${escapeHtml(item.recipientEmail || "não identificado")}</div>
             </div>
           </div>
@@ -611,7 +815,7 @@
             setTimeout(() => {
               copyBtn.textContent = oldText;
             }, 1200);
-          } catch (err) {
+          } catch {
             alert("Não consegui copiar.");
           }
         });
@@ -640,6 +844,19 @@
       }
     }
 
+    activateBtn.addEventListener("click", activateLicense);
+
+    licenseInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        activateLicense();
+      }
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      clearSession();
+      showAuth();
+    });
+
     copyLastBtn.addEventListener("click", async () => {
       const code = lastCodeEl.textContent || "";
 
@@ -655,13 +872,18 @@
         setTimeout(() => {
           copyLastBtn.textContent = oldText;
         }, 1200);
-      } catch (err) {
+      } catch {
         alert("Não consegui copiar.");
       }
     });
 
-    loadMessages();
-    setInterval(loadMessages, 3000);
+    const session = getSession();
+    if (isSessionValid(session)) {
+      showApp();
+    } else {
+      clearSession();
+      showAuth();
+    }
   </script>
 </body>
 </html>

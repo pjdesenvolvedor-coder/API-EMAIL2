@@ -533,6 +533,7 @@
     const STORAGE_AUTH = "webhook_fixed_password_auth_v1";
 
     let emails = [];
+    let lastEmailsData = null;
     let openState = {
       contentOpen: false,
       debugOpen: false
@@ -783,13 +784,24 @@
 
     async function loadMessages() {
       try {
-        saveOpenState();
-
         statusEl.textContent = "Atualizando...";
         const res = await fetch("/api/webhook");
         const data = await res.json();
+        
+        const emailsArray = Array.isArray(data.emails) ? data.emails : [];
+        const currentDataStr = JSON.stringify(emailsArray);
 
-        emails = Array.isArray(data.emails) ? data.emails : [];
+        if (currentDataStr === lastEmailsData) {
+          statusEl.textContent = emailsArray.length
+            ? "1 mensagem recebida"
+            : "Nenhuma mensagem recebida";
+          return;
+        }
+
+        lastEmailsData = currentDataStr;
+        saveOpenState();
+
+        emails = emailsArray;
         renderMessages();
 
         statusEl.textContent = emails.length
